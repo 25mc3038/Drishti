@@ -2,17 +2,17 @@
 
 import { createContext, useContext, useEffect, useState } from 'react';
 
-type Theme = 'dark' | 'light';
+export type AppTheme = 'dark' | 'light';
 
 type ThemeProviderProps = {
   children: React.ReactNode;
-  defaultTheme?: Theme;
+  defaultTheme?: AppTheme;
   storageKey?: string;
 };
 
 type ThemeProviderState = {
-  theme: Theme;
-  setTheme: (theme: Theme) => void;
+  theme: AppTheme;
+  setTheme: (theme: AppTheme) => void;
 };
 
 const initialState: ThemeProviderState = {
@@ -25,15 +25,17 @@ const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
 export function ThemeProvider({
   children,
   defaultTheme = 'dark',
-  storageKey = 'vite-ui-theme',
+  storageKey = 'drishti_global_theme',
   ...props
 }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>(defaultTheme);
+  const [theme, setTheme] = useState<AppTheme>(defaultTheme);
 
   useEffect(() => {
-    const storedTheme = localStorage.getItem(storageKey) as Theme | null;
-    if (storedTheme) {
+    const storedTheme = localStorage.getItem(storageKey) as AppTheme | null;
+    if (storedTheme === 'light' || storedTheme === 'dark') {
       setTheme(storedTheme);
+    } else {
+      setTheme('dark');
     }
   }, [storageKey]);
 
@@ -42,11 +44,12 @@ export function ThemeProvider({
 
     root.classList.remove('light', 'dark');
     root.classList.add(theme);
+    root.setAttribute('data-theme', theme);
   }, [theme]);
 
   const value = {
     theme,
-    setTheme: (theme: Theme) => {
+    setTheme: (theme: AppTheme) => {
       localStorage.setItem(storageKey, theme);
       setTheme(theme);
     },
